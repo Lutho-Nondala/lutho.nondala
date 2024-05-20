@@ -2,13 +2,19 @@ package com.enviro.assessment.grad001.lutho.nondala.controller;
 
 import com.enviro.assessment.grad001.lutho.nondala.entity.Waste;
 import com.enviro.assessment.grad001.lutho.nondala.service.WasteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("enviro/waste/")
@@ -16,10 +22,13 @@ public class WasteController {
     @Autowired
     private WasteService service;
 
-    @PostMapping(value = "create", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Waste> create(@RequestPart("Waste") Waste waste, @RequestPart("Category") long id){
+    @PostMapping("create")
+    public ResponseEntity<Waste> create(@Valid @RequestBody Waste waste, BindingResult result){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(this.service.create(waste, id));
+            if (result.hasErrors()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(this.service.create(waste));
         } catch (Exception e){
             System.out.println(e.getMessage());
             return null;
@@ -29,6 +38,9 @@ public class WasteController {
     @GetMapping("read/{id}")
     public ResponseEntity<Waste> read(@PathVariable long id){
         try {
+            if (id == 0 || String.valueOf(id) == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
             return ResponseEntity.status(HttpStatus.OK).body(this.service.read(id));
         } catch (Exception e){
             System.out.println(e.getMessage());
@@ -37,8 +49,11 @@ public class WasteController {
     }
 
     @PutMapping("update")
-    public ResponseEntity<Waste> update(@RequestBody Waste waste){
+    public ResponseEntity<Waste> update(@Valid @RequestBody Waste waste, BindingResult result){
         try {
+            if (result.hasErrors() || waste.getId() == 0 || String.valueOf(waste.getId()) == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
             return ResponseEntity.status(HttpStatus.OK).body(this.service.update(waste));
         } catch (Exception e){
             System.out.println(e.getMessage());
@@ -73,5 +88,18 @@ public class WasteController {
             System.out.println(e.getMessage());
             return null;
         }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

@@ -1,9 +1,13 @@
 package com.enviro.assessment.grad001.lutho.nondala.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.NotFound;
 
 @Entity
 @Setter
@@ -13,10 +17,18 @@ public class Waste {
     @Id
     @GeneratedValue
     private long id;
+    @NotBlank(message = "Please provide a description.")
+    @jakarta.validation.constraints.NotNull
     private String description;
+    @NotBlank(message = "Please provide disposal guidelines.")
+    @jakarta.validation.constraints.NotNull
     private String disposalGuidelines;
+    @NotBlank(message = "Please provide recycling tips.")
+    @jakarta.validation.constraints.NotNull
     private String recyclingTips;
 
+    @jakarta.validation.constraints.NotNull
+    @Valid
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;

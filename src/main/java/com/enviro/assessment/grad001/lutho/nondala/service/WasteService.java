@@ -15,9 +15,7 @@ public class WasteService {
     @Autowired
     private CategoryService categoryService;
 
-    public Waste create(Waste waste, long id){
-        Category category = this.categoryService.read(id);
-        waste.setCategory(category);
+    public Waste create(Waste waste){
         return wasteRepository.save(waste);
     }
 

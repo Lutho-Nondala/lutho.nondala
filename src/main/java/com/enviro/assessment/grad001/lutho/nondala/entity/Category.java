@@ -2,9 +2,11 @@ package com.enviro.assessment.grad001.lutho.nondala.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Set;
 
@@ -16,6 +18,8 @@ public class Category {
     @Id
     @GeneratedValue
     private long id;
+    @jakarta.validation.constraints.NotNull
+    @NotBlank(message = "Please provide category name.")
     private String category;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", fetch = FetchType.LAZY)
