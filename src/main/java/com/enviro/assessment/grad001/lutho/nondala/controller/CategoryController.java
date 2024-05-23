@@ -24,11 +24,8 @@ public class CategoryController {
     private CategoryService service;
 
     @PostMapping("create")
-    public ResponseEntity<Category> create(@Valid @RequestBody Category category, BindingResult result){
+    public ResponseEntity<Category> create(@Valid @RequestBody Category category){
         try {
-            if (result.hasErrors()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-            }
             return ResponseEntity.status(HttpStatus.OK).body(this.service.create(category));
         } catch (Exception e){
             System.out.println(e.getMessage());
@@ -47,9 +44,9 @@ public class CategoryController {
     }
 
     @PutMapping("update")
-    public ResponseEntity<Category> update(@Valid @RequestBody Category category, BindingResult result){
+    public ResponseEntity<Category> update(@Valid @RequestBody Category category){
         try {
-            if (result.hasErrors() || category.getId() == 0 || String.valueOf(category.getId()) == null){
+            if (category.getId() == 0 || String.valueOf(category.getId()) == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
             return ResponseEntity.status(HttpStatus.OK).body(this.service.update(category));
